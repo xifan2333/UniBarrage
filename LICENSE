@@ -1,21 +1,76 @@
-MIT License
+# 软件许可证协议 / Software License Agreement
 
-Copyright (c) 2024 Barry Wang
+## 第 1 部分：GPL 许可 / Part 1: GPL License
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+本软件以 **GNU 通用公共许可证（GNU General Public License, GPL）第 3 版** 许可，您可以按照该许可证的条款自由使用、复制、修改和分发本软件。
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+This software is licensed under the **GNU General Public License (GPL) Version 3**, allowing you to freely use, copy, modify, and distribute the software under its terms.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+GPL 许可证条款的主要内容包括：
+
+The main points of the GPL license include:
+
+1. 您可以自由使用本软件的副本，包括用于个人、教育或研究目的。
+   - You can freely use copies of this software for personal, educational, or research purposes.
+2. 您可以自由修改本软件的源代码，并发布修改后的版本，但发布时需保留 GPL 许可。
+   - You can freely modify the source code of this software and distribute modified versions, provided the GPL license is retained.
+3. 如果您分发本软件（或其修改版），需要提供源代码并保持 GPL 许可。
+   - If you distribute this software (or its modified versions), you must provide the source code and retain the GPL license.
+
+完整的 GPL 第 3 版条款请参考：[https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html)。
+
+For the complete GPL Version 3 terms, please refer to: [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html).
+
+---
+
+## 第 2 部分：商业授权 / Part 2: Commercial License
+
+如果您希望将本软件用于商业目的，例如：
+
+If you wish to use this software for commercial purposes, such as:
+
+- 将本软件嵌入您的闭源产品；
+  - Embedding this software into your proprietary products;
+- 提供基于本软件的商业服务；
+  - Offering commercial services based on this software;
+- 在限制条件下重新分发本软件；
+  - Redistributing this software under restrictive terms;
+
+您需要获得单独的商业授权。
+
+You need to obtain a separate commercial license.
+
+### 商业授权的主要优势 / Key Benefits of the Commercial License
+
+1. 无需遵循 GPL 要求发布您的修改版源代码。
+   - No need to comply with GPL requirements to release the source code of your modified versions.
+2. 提供商业支持和技术服务（可选）。
+   - Access to commercial support and technical services (optional).
+3. 定制功能开发（根据合同协商）。
+   - Custom feature development (as agreed upon in the contract).
+
+### 如何获取商业授权 / How to Obtain a Commercial License
+
+请通过以下方式联系我们，以获得商业授权：
+
+Please contact us through the following methods to obtain a commercial license:
+
+- **电子邮件 / Email**：[starbarry777@qq.com](mailto:starbarry777@qq.co)
+
+我们将根据您的需求提供授权条款和费用详情。
+
+We will provide licensing terms and pricing details based on your needs.
+
+---
+
+## 注意事项 / Notes
+
+1. **非商业用户**：如果您仅用于非商业目的，可以继续按照 GPL 许可证条款使用本软件，无需支付费用。
+   - **Non-commercial users**: If you use this software for non-commercial purposes only, you may continue to use it under the GPL license without any fees.
+2. **商业用户**：任何商业用途（如上所述）均需获得商业授权，否则将视为违反本协议。
+   - **Commercial users**: Any commercial use (as described above) requires a commercial license; otherwise, it will be considered a violation of this agreement.
+
+感谢您对本软件的支持！
+
+Thank you for supporting this software!
+
