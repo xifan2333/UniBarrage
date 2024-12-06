@@ -1,9 +1,39 @@
 # UniBarrage 文档 📜✨
 
-**UniBarrage** 是一个高性能实时代理和统一弹幕数据转发器，用于支持多平台（如抖音、哔哩哔哩、快手、斗鱼、虎牙）的直播弹幕转发。
+**UniBarrage** 是一款开源的高性能实时代理工具，专为开发者设计，旨在统一多平台（如抖音、哔哩哔哩、快手、斗鱼、虎牙）直播弹幕数据的采集、解析和转发。通过标准化的 WebSocket 消息协议和灵活的 API 接口，UniBarrage 将分散的多平台弹幕数据统一为一致的格式，帮助开发者更高效地构建跨平台互动功能。  
 
-**UniBarrage** is a high-performance real-time proxy and unified barrage data forwarder, supporting live streaming
-platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
+**UniBarrage** is an **open-source** high-performance real-time proxy tool designed for developers, focusing on unifying the collection, parsing, and forwarding of live barrage data from multiple platforms (e.g., Douyin, Bilibili, Kuaishou, Douyu, and Huya). With standardized WebSocket message protocols and flexible API interfaces, UniBarrage consolidates disparate multi-platform barrage data into a consistent format, enabling developers to build cross-platform interactive features more efficiently.
+
+---
+
+### **核心特点 🌟 | Core Features**
+
+- **多平台支持 🖥️**：同时兼容多种主流直播平台，无需针对不同平台重复开发。
+  **Multi-Platform Support 🖥️**: Compatible with various mainstream live streaming platforms, eliminating the need for repetitive development.
+  
+- **实时性强 ⚡**：通过高性能 WebSocket 提供毫秒级延迟的弹幕转发服务。
+  **High Real-Time Performance ⚡**: Leverages high-performance WebSocket to deliver millisecond-latency barrage forwarding services.
+  
+- **统一数据结构 🔄**：简化开发者工作，轻松实现跨平台互动功能。
+  **Unified Data Structure 🔄**: Simplifies development by enabling seamless cross-platform interactive features.
+  
+- **灵活扩展性 🔧**：支持多种启动参数和 API 调用，满足不同场景的定制化需求。
+  **Flexible Extensibility 🔧**: Supports diverse startup parameters and API calls to meet the customization needs of various scenarios.
+  
+- **小巧的二进制体积 📦**：高度优化的代码，编译后的二进制文件小于 10MB，便于分发和部署。
+  **Compact Binary Size 📦**: Highly optimized code with a compiled binary size of less than 10MB, making it easy to distribute and deploy.
+  
+- **100% 不丢失弹幕消息 🛡️**：得益于 Go 的通道机制和高性能队列，确保每条弹幕都能被安全、高效地处理和转发。
+  **100% No Message Loss 🛡️**: Powered by Go's channel mechanism and high-performance queues, ensuring every message is handled and forwarded safely and efficiently.
+  
+- **开源与社区支持 🌍**：完全开源，拥有活跃的社区支持，开发者可轻松贡献或扩展功能。
+  **Open Source with Community Support 🌍**: Fully open-source with an active community, allowing developers to easily contribute or extend its capabilities.
+
+---
+
+**UniBarrage** 不仅适用于个人开发者快速构建项目，也为团队协作提供了一个稳定、可靠的基础设施，助力直播生态的创新发展。无论是实现跨平台弹幕墙、智能弹幕分析，还是与观众实时互动，UniBarrage 都是您的得力助手。  
+  
+**UniBarrage** is not only ideal for individual developers to rapidly build projects but also provides a stable and reliable infrastructure for team collaboration, driving innovation in the live streaming ecosystem. Whether it’s for building cross-platform barrage walls, performing intelligent barrage analysis, or engaging in real-time interaction with the audience, UniBarrage is your trusted assistant.
 
 ---
 
