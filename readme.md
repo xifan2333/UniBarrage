@@ -24,7 +24,7 @@
 -
   **Flexible Extensibility 🔧**: Supports diverse startup parameters and API calls to meet the customization needs of various scenarios.
   
-- **小巧的二进制体积 📦**：高度优化的代码，编译后的二进制文件小于 10MB，便于分发和部署。
+- **小巧的二进制体积 📦**：高度优化的代码，编译后的二进制文件 ≈ 7MB ，便于分发和部署。
 -
   **Compact Binary Size 📦**: Highly optimized code with a compiled binary size of less than 10MB, making it easy to distribute and deploy.
   
