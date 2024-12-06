@@ -1,0 +1,12 @@
+{
+  "name": "douyu-barrage",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "fast-text-encoding": "^1.0.6",
+    "ws": "^8.18.0"
+  }
+}

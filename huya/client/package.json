@@ -1,0 +1,14 @@
+{
+  "name": "huya-barrage",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "md5": "^2.3.0",
+    "node-fetch": "^2.7.0",
+    "to-arraybuffer": "^1.0.1",
+    "ws": "^8.18.0"
+  }
+}
