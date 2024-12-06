@@ -1,39 +1,65 @@
 # UniBarrage 文档 📜✨
 
-**UniBarrage** 是一个高性能实时代理和统一弹幕数据转发器，用于支持多平台（如抖音、哔哩哔哩、快手、斗鱼、虎牙）的直播弹幕转发。  
-**UniBarrage** is a high-performance real-time proxy and unified barrage data forwarder, supporting live streaming
-platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
+**UniBarrage** 是一个高性能实时代理和统一弹幕数据转发器，用于支持多平台（如抖音、哔哩哔哩、快手、斗鱼、虎牙）的直播弹幕转发。
+**UniBarrage** is a high-performance real-time proxy and unified barrage data forwarder, supporting live streaming platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
 
 ---
 
-## 一、API 接口文档 API Documentation 🌐📖
+## 一、文档大纲
 
-### 1.1 二进制启动参数 Command Line Parameters ⚙️
+1. [UniBarrage 简介 🌟](#unibarrage-intro)
+2. [API 接口文档 🌐](#api-documentation)
+    - [启动参数 ⚙️](#startup-parameters)
+    - [API 列表 📬](#api-list)
+3. [WebSocket 消息结构 📡](#websocket-message-structure)
+    - [消息字段说明 📜](#message-field-descriptions)
+    - [消息类型及示例 🧩](#message-types-and-examples)
+4. [错误码参考表 🚨](#error-codes)
 
-| 参数名 Parameter | 类型 Type | 默认值 Default | 描述 Description                 |
-|---------------|---------|-------------|--------------------------------|
-| `-wsHost`     | string  | `127.0.0.1` | WebSocket 服务的主机地址 Host Address |
-| `-wsPort`     | int     | `7777`      | WebSocket 服务的端口号 Port          |
-| `-apiHost`    | string  | `127.0.0.1` | API 服务的主机地址 Host Address       |
-| `-apiPort`    | int     | `8080`      | API 服务的端口号 Port                |
-| `-useProxy`   | bool    | `false`     | 是否启用代理服务 Enable Proxy          |
-| `-authToken`  | string  | `""`        | Bearer Token (仅 API)           |
+---
 
-### 示例命令 Example Command 🛠️
+<a id="unibarrage-intro"></a>
+## UniBarrage 简介 🌟
+
+UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工具，支持高性能实时代理及标准化转发。
+
+- **支持平台**: 抖音、哔哩哔哩、快手、斗鱼、虎牙
+- **核心功能**: 统一格式的 WebSocket 消息流和灵活的 API 接口
+
+---
+
+<a id="api-documentation"></a>
+## API 接口文档 🌐
+
+<a id="startup-parameters"></a>
+### 启动参数 ⚙️
+
+| 参数名          | 类型       | 默认值         | 描述                      |
+| ------------ | -------- | ----------- | ----------------------- |
+| `-wsHost`    | `string` | `127.0.0.1` | WebSocket 服务的主机地址       |
+| `-wsPort`    | `int`    | `7777`      | WebSocket 服务的端口号        |
+| `-apiHost`   | `string` | `127.0.0.1` | API 服务的主机地址             |
+| `-apiPort`   | `int`    | `8080`      | API 服务的端口号              |
+| `-useProxy`  | `bool`   | `false`     | 是否启用代理服务                |
+| `-authToken` | `string` | `""`        | Bearer Token (仅 API 使用) |
+
+#### 示例命令 🛠️
 
 ```bash
-./UniBarrage -wsHost 192.168.1.10 -wsPort 9000 -apiHost 192.168.1.10 -apiPort 8081 -useProxy
+# 示例：启动 UniBarrage 服务
+./UniBarrage -wsHost 127.0.0.1 -wsPort 7777 -apiHost 127.0.0.1 -apiPort 8080 -useProxy
 ```
 
 ---
 
-### 1.2 接口列表 API Endpoints 📬
+<a id="api-list"></a>
+### API 列表 📬
 
 #### 欢迎接口 Welcome Endpoint 👋
 
 - **URL**: `/`
 - **方法 Method**: `GET`
-- **描述 Description**: 返回欢迎信息，验证服务是否启动 Returns a welcome message to verify if the service is running.
+- **描述 Description**: 返回欢迎信息，验证服务是否启动。
 
 **响应示例 Response Example:**
 
@@ -45,13 +71,11 @@ platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
 }
 ```
 
----
-
 #### 获取所有服务状态 Get All Services Status 🔄
 
 - **URL**: `/all`
 - **方法 Method**: `GET`
-- **描述 Description**: 获取所有正在运行的服务状态 Get the status of all running services.
+- **描述 Description**: 获取所有正在运行的服务状态。
 
 **响应示例 Response Example:**
 
@@ -72,13 +96,11 @@ platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
 }
 ```
 
----
-
 #### 获取指定平台的所有服务 Get Services for Specific Platform 🔍
 
 - **URL**: `/{platform}`
 - **方法 Method**: `GET`
-- **描述 Description**: 获取指定平台的所有服务 Get all services for a specific platform.
+- **描述 Description**: 获取指定平台的所有服务。
 
 **请求参数 Request Parameters:**
 
@@ -99,13 +121,11 @@ platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
 }
 ```
 
----
-
 #### 获取单个服务状态 Get Single Service Status 🧐
 
 - **URL**: `/{platform}/{roomId}`
 - **方法 Method**: `GET`
-- **描述 Description**: 获取指定房间的服务状态 Get the status of a specific room.
+- **描述 Description**: 获取指定房间的服务状态。
 
 **请求参数 Request Parameters:**
 
@@ -125,13 +145,11 @@ platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
 }
 ```
 
----
-
 #### 启动服务 Start Service 🚀
 
 - **URL**: `/{platform}`
 - **方法 Method**: `POST`
-- **描述 Description**: 启动指定平台的直播服务 Start a live service for a specified platform.
+- **描述 Description**: 启动指定平台的直播服务。
 
 **请求体 Request Body Example:**
 
@@ -161,13 +179,11 @@ platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
 }
 ```
 
----
-
 #### 停止服务 Stop Service 🛑
 
 - **URL**: `/{platform}/{roomId}`
 - **方法 Method**: `DELETE`
-- **描述 Description**: 停止指定平台房间的服务 Stop the service for a specific room on a platform.
+- **描述 Description**: 停止指定平台房间的服务。
 
 **请求参数 Request Parameters:**
 
@@ -189,61 +205,27 @@ platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
 
 ---
 
-### 错误响应示例 Error Response Example ❗
+<a id="websocket-message-structure"></a>
+## WebSocket 消息结构 📡
 
-**示例 Example:**
+<a id="message-field-descriptions"></a>
+### 消息字段说明 📜
 
-```json
-{
-  "code": 404,
-  "message": "服务未找到 Service not found",
-  "data": null
-}
+```text
+- rid: 房间号 Room ID
+- platform: 来源平台 Platform (如 Douyin, Bilibili)
+- type: 消息类型 Message Type
+  - Chat: 聊天消息
+  - Gift: 礼物消息
+  - Like: 点赞消息
+  - EnterRoom: 进入房间消息
+  - Subscribe: 订阅消息
+  - SuperChat: 超级聊天消息
+  - EndLive: 结束直播消息
 ```
 
----
-
-### 错误码 Error Codes 🚨
-
-| 错误码 Code | 描述 Description                |
-|----------|-------------------------------|
-| `200`    | 请求成功 Request successful       |
-| `201`    | 服务创建成功 Service created        |
-| `400`    | 请求参数错误 Bad request parameters |
-| `404`    | 服务未找到 Service not found       |
-| `500`    | 服务器内部错误 Internal server error |
-
----
-
-## 二、WebSocket 消息结构 WebSocket Message Structure 📡💬
-
-### 2.1 消息结构 Message Structure 🌐
-
-```json
-{
-  "rid": "房间号 Room ID",
-  "platform": "来源平台 Platform",
-  "type": "消息类型 Message Type",
-  "data": "消息内容数据 Message Data"
-}
-```
-
-### 字段说明 Field Descriptions 📜
-
-- **`rid`**: 房间号 Room ID.
-- **`platform`**: 来源平台 Platform, 包括 Douyin, Bilibili, 等等.
-- **`type`**: 消息类型 Message Type:
-    - `Chat` 聊天消息 Chat Message 💬
-    - `Gift` 礼物消息 Gift Message 🎁
-    - `Like` 点赞消息 Like Message 👍
-    - `EnterRoom` 进入房间消息 Enter Room 🏠
-    - `Subscribe` 订阅消息 Subscribe Message 🛎️
-    - `SuperChat` 超级聊天消息 Super Chat 💵
-    - `EndLive` 结束直播 End Live 📴
-
----
-
-### 2.2 消息内容结构 Message Data Structures 🧩
+<a id="message-types-and-examples"></a>
+### 消息类型及示例 🧩
 
 #### Chat 消息 Chat Message 💬
 
@@ -329,80 +311,18 @@ platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
 
 ---
 
-### 2.3 示例消息 Examples 🌟
+<a id="error-codes"></a>
+## 错误码参考表 🚨
 
-**Chat 消息 Chat Message Example:**
-
-```json
-{
-  "rid": "123456",
-  "platform": "douyin",
-  "type": "Chat",
-  "data": {
-    "name": "用户A",
-    "avatar": "https://example.com/avatar.jpg",
-    "content": "这是聊天消息 This is a chat message."
-  }
-}
-```
-
-**Gift 消息 Gift Message Example:**
-
-```json
-{
-  "rid": "789012",
-  "platform": "bilibili",
-  "type": "Gift",
-  "data": {
-    "name": "用户B",
-    "avatar": "https://example.com/avatar2.jpg",
-    "item": "火箭 Rocket 🚀",
-    "num": 1,
-    "price": 500.0
-  }
-}
-```
-
-**Like 消息 Like Message Example:**
-
-```json
-{
-  "rid": "112233",
-  "platform": "kuaishou",
-  "type": "Like",
-  "data": {
-    "name": "用户D",
-    "avatar": "https://example.com/avatar4.jpg",
-    "count": 10
-  }
-}
-```
-
-**EnterRoom 消息 Enter Room Message Example:**
-
-```json
-{
-  "rid": "556677",
-  "platform": "huya",
-  "type": "EnterRoom",
-  "data": {
-    "name": "用户E",
-    "avatar": "https://example.com/avatar5.jpg"
-  }
-}
-```
-
-**EndLive 消息 End Live Message Example:**
-
-```json
-{
-  "rid": "666888",
-  "platform": "douyin",
-  "type": "EndLive",
-  "data": {}
-}
-```
+| 错误码 Code | 描述 Description            |
+| -------- | ------------------------- |
+| `200`    | ✅ 请求成功 Request successful |
+| `201`    | ✅ 服务创建成功 Service created  |
+| `400`    | ⚠️ 请求参数错误 Bad request     |
+| `404`    | ❌ 服务未找到 Service not found |
+| `500`    | ❌ 服务器内部错误 Internal error  |
 
 ---
 
-💡 **注意 Tips:** 此文档整合了 API 和 WebSocket 消息结构的所有信息，提供开发者一个清晰、一致的参考框架！
+💡 **提示 Tips:** 此文档整合了 API 和 WebSocket 消息结构的所有信息，提供开发者一个清晰、一致的参考框架！
+
