@@ -1,4 +1,9 @@
 # UniBarrage 文档 📜✨
+<br>
+
+<img src="https://s2.loli.net/2024/12/07/znBlgdsIHY6XNhr.png" alt="UniBarrage" style="display: block; margin: auto;" width="500">  
+
+<br>
 
 **UniBarrage** 是一款开源的高性能实时代理工具，专为开发者设计，旨在统一多平台（如抖音、哔哩哔哩、快手、斗鱼、虎牙）直播弹幕数据的采集、解析和转发。通过标准化的 WebSocket 消息协议和灵活的 API 接口，UniBarrage 将分散的多平台弹幕数据统一为一致的格式，帮助开发者更高效地构建跨平台互动功能。  
 
