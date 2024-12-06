@@ -1,7 +1,9 @@
 # UniBarrage 文档 📜✨
 <br>
 
-<img src="https://s2.loli.net/2024/12/07/znBlgdsIHY6XNhr.png" alt="UniBarrage" style="display: block; margin: auto;" width="500">  
+<div style="text-align: center;">
+  <img src="https://s2.loli.net/2024/12/07/znBlgdsIHY6XNhr.png" alt="UniBarrage" width="500">
+</div>
 
 <br>
 
