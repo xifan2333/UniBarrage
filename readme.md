@@ -1,7 +1,9 @@
 # UniBarrage 文档 📜✨
 
 **UniBarrage** 是一个高性能实时代理和统一弹幕数据转发器，用于支持多平台（如抖音、哔哩哔哩、快手、斗鱼、虎牙）的直播弹幕转发。
-**UniBarrage** is a high-performance real-time proxy and unified barrage data forwarder, supporting live streaming platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
+
+**UniBarrage** is a high-performance real-time proxy and unified barrage data forwarder, supporting live streaming
+platforms such as Douyin, Bilibili, Kuaishou, Douyu, and Huya.
 
 ---
 
@@ -19,6 +21,7 @@
 ---
 
 <a id="unibarrage-intro"></a>
+
 ## UniBarrage 简介 🌟
 
 UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工具，支持高性能实时代理及标准化转发。
@@ -29,13 +32,15 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 ---
 
 <a id="api-documentation"></a>
+
 ## API 接口文档 🌐
 
 <a id="startup-parameters"></a>
+
 ### 启动参数 ⚙️
 
 | 参数名          | 类型       | 默认值         | 描述                      |
-| ------------ | -------- | ----------- | ----------------------- |
+|--------------|----------|-------------|-------------------------|
 | `-wsHost`    | `string` | `127.0.0.1` | WebSocket 服务的主机地址       |
 | `-wsPort`    | `int`    | `7777`      | WebSocket 服务的端口号        |
 | `-apiHost`   | `string` | `127.0.0.1` | API 服务的主机地址             |
@@ -53,6 +58,7 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 ---
 
 <a id="api-list"></a>
+
 ### API 列表 📬
 
 #### 欢迎接口 Welcome Endpoint 👋
@@ -206,9 +212,11 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 ---
 
 <a id="websocket-message-structure"></a>
+
 ## WebSocket 消息结构 📡
 
 <a id="message-field-descriptions"></a>
+
 ### 消息字段说明 📜
 
 ```text
@@ -225,6 +233,7 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 ```
 
 <a id="message-types-and-examples"></a>
+
 ### 消息类型及示例 🧩
 
 #### Chat 消息 Chat Message 💬
@@ -312,10 +321,11 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 ---
 
 <a id="error-codes"></a>
+
 ## 错误码参考表 🚨
 
 | 错误码 Code | 描述 Description            |
-| -------- | ------------------------- |
+|----------|---------------------------|
 | `200`    | ✅ 请求成功 Request successful |
 | `201`    | ✅ 服务创建成功 Service created  |
 | `400`    | ⚠️ 请求参数错误 Bad request     |
