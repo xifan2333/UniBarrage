@@ -9,8 +9,6 @@
 
 **UniBarrage** 是一款开源的高性能实时代理工具，专为开发者设计，旨在统一多平台（如抖音、哔哩哔哩、快手、斗鱼、虎牙）直播弹幕数据的采集、解析和转发。通过标准化的 WebSocket 消息协议和灵活的 API 接口，UniBarrage 将分散的多平台弹幕数据统一为一致的格式，帮助开发者更高效地构建跨平台互动功能。  
 
-**UniBarrage** is an **open-source** high-performance real-time proxy tool designed for developers, focusing on unifying the collection, parsing, and forwarding of live barrage data from multiple platforms (e.g., Douyin, Bilibili, Kuaishou, Douyu, and Huya). With standardized WebSocket message protocols and flexible API interfaces, UniBarrage consolidates disparate multi-platform barrage data into a consistent format, enabling developers to build cross-platform interactive features more efficiently.
-
 ---
 
 ### **核心特点 🌟 | Core Features**
@@ -25,19 +23,7 @@
 
 ---
 
-- **Multi-Platform Support 🖥️**: Compatible with various mainstream live streaming platforms, eliminating the need for repetitive development.
-- **High Real-Time Performance ⚡**: Leverages high-performance WebSocket to deliver millisecond-latency barrage forwarding services.
-- **Unified Data Structure 🔄**: Simplifies development by enabling seamless cross-platform interactive features.
-- **Flexible Extensibility 🔧**: Supports diverse startup parameters and API calls to meet the customization needs of various scenarios.
-- **Compact Binary Size 📦**: Highly optimized code with a compiled binary size of less than 10MB, making it easy to distribute and deploy.
-- **100% No Message Loss 🛡️**: Powered by Go's channel mechanism and high-performance queues, ensuring every message is handled and forwarded safely and efficiently.
-- **Open Source with Community Support 🌍**: Fully open-source with an active community, allowing developers to easily contribute or extend its capabilities.
-
----
-
 **UniBarrage** 不仅适用于个人开发者快速构建项目，也为团队协作提供了一个稳定、可靠的基础设施，助力直播生态的创新发展。无论是实现跨平台弹幕墙、智能弹幕分析，还是与观众实时互动，UniBarrage 都是您的得力助手。  
-  
-**UniBarrage** is not only ideal for individual developers to rapidly build projects but also provides a stable and reliable infrastructure for team collaboration, driving innovation in the live streaming ecosystem. Whether it’s for building cross-platform barrage walls, performing intelligent barrage analysis, or engaging in real-time interaction with the audience, UniBarrage is your trusted assistant.
 
 ---
 
@@ -370,3 +356,6 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 
 💡 **提示 Tips:** 此文档整合了 API 和 WebSocket 消息结构的所有信息，提供开发者一个清晰、一致的参考框架！
 
+---
+
+❤️ Made with Love by BarryWang.
