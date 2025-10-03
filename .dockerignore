@@ -1,0 +1,30 @@
+# 编译产物
+UniBarrage
+*.exe
+*.test
+*.out
+
+# 依赖目录
+vendor/
+
+# IDE 配置
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+
+# 文档
+*.md
+CLAUDE.md
+
+# 日志
+*.log
+
+# 临时文件
+tmp/
+temp/

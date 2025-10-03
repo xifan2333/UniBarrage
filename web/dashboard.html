@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UniBarrage 控制面板</title>
+
+    <!-- NES.css -->
+    <link
+      href="https://unpkg.com/nes.css@latest/css/nes.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- 像素风中文字体 - Zpix -->
+    <link
+      rel="stylesheet"
+      href="https://chinese-fonts-cdn.deno.dev/packages/mzxst/dist/MZPXflat/result.css"
+    />
+
+    <!-- NES.icons -->
+    <link
+      href="https://unpkg.com/nes.icons@latest/css/nes-icons.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* 字体定义 */
+      body {
+        font-family: "MuzaiPixel";
+        font-weight: "400";
+      }
+
+      /* 布局 */
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0;
+      }
+
+      header {
+        margin-bottom: 40px;
+        padding: 32px 0;
+        text-align: center;
+      }
+
+      header h1 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin: 0 0 16px 0;
+        font-size: 32px;
+      }
+
+      header p {
+        margin: 8px 0;
+        font-size: 14px;
+      }
+
+      .nes-container {
+        margin-bottom: 40px;
+        padding: 24px;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+
+      .nes-field {
+        margin-bottom: 16px;
+      }
+
+      .nes-input,
+      .nes-textarea,
+      .nes-select select {
+        width: 100%;
+      }
+
+      .nes-textarea {
+        min-height: 100px;
+      }
+
+      .cookie-hint {
+        display: block;
+        margin-top: 8px;
+        font-size: 10px;
+      }
+
+      .actions-row {
+        display: flex;
+        gap: 16px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+      }
+
+      .service-item {
+        padding: 16px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .service-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+        min-width: 300px;
+      }
+
+      .platform-icon {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+      }
+
+      .service-details {
+        flex: 1;
+      }
+
+      .service-title {
+        margin-bottom: 8px;
+      }
+
+      .service-meta {
+        font-size: 10px;
+        word-break: break-all;
+      }
+
+      .service-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+      }
+
+      #alertContainer {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 400px;
+      }
+
+      #alertContainer .nes-container {
+        margin-bottom: 12px;
+      }
+
+      #alertContainer .nes-container.is-success {
+        background-color: #92cc41;
+        color: #fff;
+      }
+
+      #alertContainer .nes-container.is-error {
+        background-color: #e76e55;
+        color: #fff;
+      }
+
+      #alertContainer .nes-container.is-primary {
+        background-color: #209cee;
+        color: #fff;
+      }
+
+      .header-icon {
+        color: purple;
+        font-size: 18px;
+        line-height: 1;
+        vertical-align: middle;
+      }
+
+      /* 登录界面 */
+      #loginScreen {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10000;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #loginScreen.active {
+        display: flex;
+      }
+
+      .login-box {
+        max-width: 500px;
+        width: 100%;
+        margin: 20px;
+      }
+
+      .login-icon {
+        font-size: 18px;
+        vertical-align: middle;
+        color: purple;
+      }
+
+      #mainContent {
+        display: none;
+      }
+
+      #mainContent.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 登录界面 -->
+    <div id="loginScreen">
+      <div class="login-box">
+        <div class="nes-container with-title">
+          <p class="title">
+            <i class="nes-icon twitch-square login-icon"></i>
+            UniBarrage
+          </p>
+          <div style="text-align: center; margin-bottom: 24px;">
+            <p>需要认证才能访问控制面板</p>
+          </div>
+          <div class="nes-field">
+            <label for="loginToken">认证 Token</label>
+            <input
+              type="password"
+              id="loginToken"
+              class="nes-input"
+              placeholder="请输入 Token"
+              onkeypress="if(event.key==='Enter') handleLogin()"
+            />
+          </div>
+          <div id="loginError" class="nes-text is-error" style="display: none; margin-top: 12px; text-align: center;"></div>
+          <div style="text-align: center; margin-top: 24px;">
+            <button type="button" class="nes-btn is-primary" onclick="handleLogin()">
+              登录
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主内容 -->
+    <div id="mainContent">
+      <header>
+        <div class="container">
+          <h1>
+            <i class="nes-icon twitch-square header-icon"></i><span>UniBarrage</span>
+          </h1>
+          <p>统一多平台直播弹幕数据采集与转发</p>
+          <p>支持 哔哩哔哩 / 抖音 / 快手 / 斗鱼 / 虎牙</p>
+        </div>
+      </header>
+
+      <div class="container">
+      <div id="alertContainer"></div>
+
+      <div class="nes-container with-title">
+        <p class="title">添加直播间</p>
+        <div class="form-grid">
+          <div class="nes-field">
+            <label for="platform">平台</label>
+            <div class="nes-select">
+              <select id="platform">
+                <option value="bilibili">哔哩哔哩</option>
+                <option value="douyin">抖音</option>
+                <option value="kuaishou">快手</option>
+                <option value="douyu">斗鱼</option>
+                <option value="huya">虎牙</option>
+              </select>
+            </div>
+          </div>
+          <div class="nes-field">
+            <label for="roomId">房间号</label>
+            <input
+              type="text"
+              id="roomId"
+              class="nes-input"
+              placeholder="输入房间号"
+            />
+          </div>
+        </div>
+        <div class="nes-field">
+          <label for="cookie">Cookie (可选)</label>
+          <textarea
+            id="cookie"
+            class="nes-textarea"
+            placeholder="粘贴 Cookie 内容..."
+          ></textarea>
+          <span class="cookie-hint"
+            >提示: 某些平台需要 Cookie 才能获取完整数据</span
+          >
+        </div>
+        <div class="actions-row">
+          <button
+            type="button"
+            class="nes-btn is-success"
+            onclick="startService()"
+          >
+            启动监听
+          </button>
+          <button type="button" class="nes-btn" onclick="refreshServices()">
+            刷新列表
+          </button>
+        </div>
+      </div>
+
+      <div class="nes-container with-title">
+        <p class="title">运行中的服务</p>
+        <div id="servicesList">
+          <div class="empty-state">
+            <p>暂无运行中的服务</p>
+            <p style="font-size: 14px; margin-top: 8px">
+              请在上方添加直播间并启动监听
+            </p>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <script>
+      // 全局变量：当前的认证 token
+      let currentAuthToken = null;
+
+      // 检查是否需要认证
+      async function checkAuth() {
+        const apiUrl = getApiUrl();
+
+        try {
+          const headers = {};
+          if (currentAuthToken) {
+            headers['Authorization'] = `Bearer ${currentAuthToken}`;
+          }
+
+          const response = await fetch(`${apiUrl}/api/v1/`, {
+            method: 'GET',
+            headers: headers
+          });
+
+          if (response.status === 401) {
+            // 需要认证或 token 无效
+            currentAuthToken = null;
+            sessionStorage.removeItem('authToken');
+            document.getElementById('loginScreen').classList.add('active');
+            return false;
+          } else {
+            // 不需要认证或已认证
+            document.getElementById('mainContent').classList.add('active');
+            return true;
+          }
+        } catch (error) {
+          // 网络错误，假设不需要认证
+          document.getElementById('mainContent').classList.add('active');
+          return true;
+        }
+      }
+
+      // 处理登录
+      async function handleLogin() {
+        const token = document.getElementById('loginToken').value.trim();
+        const loginError = document.getElementById('loginError');
+
+        if (!token) {
+          loginError.textContent = '请输入 Token';
+          loginError.style.display = 'block';
+          return;
+        }
+
+        const apiUrl = getApiUrl();
+
+        try {
+          const response = await fetch(`${apiUrl}/api/v1/`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if (response.ok) {
+            // 登录成功
+            currentAuthToken = token;
+            sessionStorage.setItem('authToken', token);
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('mainContent').classList.add('active');
+            loginError.style.display = 'none';
+
+            // 刷新服务列表
+            setTimeout(refreshServices, 500);
+          } else {
+            // 登录失败
+            loginError.textContent = 'Token 无效，请重试';
+            loginError.style.display = 'block';
+          }
+        } catch (error) {
+          loginError.textContent = '网络错误，请重试';
+          loginError.style.display = 'block';
+        }
+      }
+
+      // 获取 API 地址（当前页面地址）
+      function getApiUrl() {
+        const protocol = window.location.protocol;
+        const hostname = window.location.hostname;
+        const port = window.location.port;
+        return `${protocol}//${hostname}${port ? ':' + port : ''}`;
+      }
+
+      // 获取 WebSocket 地址
+      function getWsUrl() {
+        const protocol = window.location.protocol;
+        const hostname = window.location.hostname;
+        const wsProtocol = protocol === 'https:' ? 'wss:' : 'ws:';
+        // 假设 WebSocket 端口为 7777
+        return `${wsProtocol}//${hostname}:7777`;
+      }
+
+      // 显示提示消息
+      function showAlert(message, type = "info") {
+        const container = document.getElementById("alertContainer");
+        const alert = document.createElement("div");
+
+        const typeMap = {
+          success: "is-success",
+          error: "is-error",
+          info: "is-primary",
+        };
+
+        alert.className = `nes-container ${typeMap[type] || ""}`;
+        alert.style.marginBottom = "12px";
+        alert.textContent = message;
+
+        container.appendChild(alert);
+
+        setTimeout(() => {
+          alert.style.opacity = "0";
+          setTimeout(() => alert.remove(), 300);
+        }, 5000);
+      }
+
+      // 获取请求头
+      function getHeaders() {
+        const headers = {
+          "Content-Type": "application/json",
+        };
+        if (currentAuthToken) {
+          headers["Authorization"] = `Bearer ${currentAuthToken}`;
+        }
+        return headers;
+      }
+
+      // 启动服务
+      async function startService() {
+        const apiUrl = getApiUrl();
+        const platform = document.getElementById("platform").value;
+        const roomId = document.getElementById("roomId").value;
+        const cookie = document.getElementById("cookie").value;
+
+        if (!roomId) {
+          showAlert("请输入房间号", "error");
+          return;
+        }
+
+        const payload = { rid: roomId };
+        if (cookie) {
+          payload.cookie = cookie;
+        }
+
+        try {
+          const response = await fetch(`${apiUrl}/api/v1/${platform}`, {
+            method: "POST",
+            headers: getHeaders(),
+            body: JSON.stringify(payload),
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            showAlert(
+              `${getPlatformName(platform)} 房间 ${roomId} 启动成功！`,
+              "success"
+            );
+            document.getElementById("roomId").value = "";
+            document.getElementById("cookie").value = "";
+            setTimeout(refreshServices, 1000);
+          } else {
+            showAlert(`启动失败: ${result.message || "未知错误"}`, "error");
+          }
+        } catch (error) {
+          showAlert(`请求失败: ${error.message}`, "error");
+        }
+      }
+
+      // 停止服务
+      async function stopService(platform, roomId) {
+        const apiUrl = getApiUrl();
+
+        try {
+          const response = await fetch(
+            `${apiUrl}/api/v1/${platform}/${roomId}`,
+            {
+              method: "DELETE",
+              headers: getHeaders(),
+            }
+          );
+
+          const result = await response.json();
+
+          if (response.ok) {
+            showAlert(
+              `${getPlatformName(platform)} 房间 ${roomId} 已停止`,
+              "success"
+            );
+            refreshServices();
+          } else {
+            showAlert(`停止失败: ${result.message || "未知错误"}`, "error");
+          }
+        } catch (error) {
+          showAlert(`请求失败: ${error.message}`, "error");
+        }
+      }
+
+      // 刷新服务列表
+      async function refreshServices() {
+        const apiUrl = getApiUrl();
+        const wsUrl = getWsUrl();
+        const servicesList = document.getElementById("servicesList");
+
+        try {
+          const response = await fetch(`${apiUrl}/api/v1/all`, {
+            headers: getHeaders(),
+          });
+
+          const result = await response.json();
+
+          if (response.ok && result.data && result.data.length > 0) {
+            servicesList.innerHTML = result.data
+              .map(
+                (service) => `
+                        <div class="service-item">
+                            <div class="service-info">
+                                <div class="platform-icon icon-${
+                                  service.platform
+                                }">
+                                    ${getPlatformIcon(service.platform)}
+                                </div>
+                                <div class="service-details">
+                                    <div class="service-title">
+                                        ${getPlatformName(
+                                          service.platform
+                                        )} - 房间 ${service.rid}
+                                        <span class="nes-badge is-splited">
+                                            <span class="is-success">运行中</span>
+                                        </span>
+                                    </div>
+                                    <div class="service-meta">
+                                        WebSocket: ${wsUrl}/${
+                  service.platform
+                }/${service.rid}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="service-actions">
+                                <button type="button" class="nes-btn" onclick="copyWSUrl('${wsUrl}/${
+                  service.platform
+                }/${service.rid}')">复制链接</button>
+                                <button type="button" class="nes-btn is-error" onclick="stopService('${
+                                  service.platform
+                                }', '${service.rid}')">停止</button>
+                            </div>
+                        </div>
+                    `
+              )
+              .join("");
+          } else {
+            servicesList.innerHTML = `
+                        <div class="empty-state">
+                            <p>暂无运行中的服务</p>
+                            <p style="font-size: 14px; margin-top: 8px;">请在上方添加直播间并启动监听</p>
+                        </div>
+                    `;
+          }
+        } catch (error) {
+          showAlert(`获取服务列表失败: ${error.message}`, "error");
+        }
+      }
+
+      // 复制 WebSocket URL
+      function copyWSUrl(url) {
+        navigator.clipboard
+          .writeText(url)
+          .then(() => {
+            showAlert("WebSocket 地址已复制到剪贴板", "success");
+          })
+          .catch(() => {
+            showAlert("复制失败，请手动复制", "error");
+          });
+      }
+
+      // 获取平台名称
+      function getPlatformName(platform) {
+        const names = {
+          bilibili: "哔哩哔哩",
+          douyin: "抖音",
+          kuaishou: "快手",
+          douyu: "斗鱼",
+          huya: "虎牙",
+        };
+        return names[platform] || platform;
+      }
+
+      // 获取平台图标
+      function getPlatformIcon(platform) {
+        const icons = {
+          bilibili: "B",
+          douyin: "D",
+          kuaishou: "K",
+          douyu: "DY",
+          huya: "H",
+        };
+        return icons[platform] || platform[0].toUpperCase();
+      }
+
+      // 页面加载初始化
+      (async function init() {
+        // 检查 sessionStorage 中是否有保存的 token
+        const savedToken = sessionStorage.getItem('authToken');
+        if (savedToken) {
+          currentAuthToken = savedToken;
+        }
+
+        // 检查是否需要认证
+        const authed = await checkAuth();
+
+        // 如果已认证，刷新服务列表
+        if (authed) {
+          refreshServices();
+          // 每 5 秒自动刷新服务列表
+          setInterval(refreshServices, 5000);
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -8,6 +8,7 @@ import (
 	"UniBarrage/kuaishou"
 	uni "UniBarrage/universal"
 	log "UniBarrage/utils/trace"
+	"UniBarrage/web"
 	"context"
 	"errors"
 	"fmt"
@@ -28,10 +29,6 @@ func StartServer(host string, port int, certFile string, keyFile string, expecte
 	// 中间件
 	// r.Use(middleware.Logger)  // 删除这行来关闭 chi 的日志
 	r.Use(middleware.Recoverer)
-	// 仅在指定了 token 时使用 AuthMiddleware
-	if expectedToken != "" {
-		r.Use(AuthMiddleware(expectedToken))
-	}
 
 	// 配置 CORS 中间件，使用传入的 allowedOrigins 数组
 	corsOptions := cors.Options{
@@ -44,13 +41,15 @@ func StartServer(host string, port int, certFile string, keyFile string, expecte
 	}
 	r.Use(cors.Handler(corsOptions))
 
-	// 根路由 - 欢迎信息
-	//r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-	//	jsonResponse(w, http.StatusOK, "Hello, UniBarrage!", nil)
-	//})
+	// Dashboard 路由（不需要认证）
+	r.Get("/", ServeDashboard)
 
-	// API 路由
+	// API 路由（需要认证）
 	r.Route("/api/v1", func(r chi.Router) {
+		// 仅在指定了 token 时对 API 路由使用 AuthMiddleware
+		if expectedToken != "" {
+			r.Use(AuthMiddleware(expectedToken))
+		}
 		// 欢迎信息
 		r.Get("/", Hello)
 		// 获取所有服务状态
@@ -70,12 +69,14 @@ func StartServer(host string, port int, certFile string, keyFile string, expecte
 	if certFile != "" && keyFile != "" {
 		// 启动 HTTPS 服务
 		log.Printf("INFO", "API: https://%s", addr)
+		log.Printf("INFO", "Dashboard: https://%s", addr)
 		if err := http.ListenAndServeTLS(addr, certFile, keyFile, r); err != nil {
 			log.Printf("ERROR", "服务器启动失败: %v", err)
 		}
 	} else {
 		// 启动 HTTP 服务
 		log.Printf("INFO", "API: http://%s", addr)
+		log.Printf("INFO", "Dashboard: http://%s", addr)
 		if err := http.ListenAndServe(addr, r); err != nil {
 			log.Printf("ERROR", "服务器启动失败: %v", err)
 		}
@@ -467,4 +468,11 @@ func jsonResponse(w http.ResponseWriter, code int, message string, data interfac
 // 错误响应处理函数
 func jsonError(w http.ResponseWriter, code int, message string) {
 	jsonResponse(w, code, message, nil)
+}
+
+// ServeDashboard 提供嵌入的 dashboard.html
+func ServeDashboard(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(web.DashboardHTML)
 }

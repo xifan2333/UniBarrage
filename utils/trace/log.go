@@ -21,8 +21,7 @@ const maxLogLines = 20 // 固定显示高度
 var (
 	headerStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#171717")).
+			Foreground(lipgloss.Color("#FF69B4")).
 			Padding(2, 2). // 上下和左右的间距
 			Bold(true).
 			Width(82).
@@ -30,82 +29,69 @@ var (
 
 	titleStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#6D00E8")).
+			Foreground(lipgloss.Color("#6D00E8")).
 			Padding(0, 1).
 			Bold(true)
 
 	infoStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#339933")).
+			Foreground(lipgloss.Color("#339933")).
 			Padding(0, 1).
 			Bold(true)
 
 	warnStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#1F1F1F")).
-			Background(lipgloss.Color("#FFCC33")).
+			Foreground(lipgloss.Color("#FFCC33")).
 			Padding(0, 1).
 			Bold(true)
 
 	errorStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#CC3333")).
+			Foreground(lipgloss.Color("#CC3333")).
 			Padding(0, 1).
 			Bold(true)
 
 	timeStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#292929")).
+			Foreground(lipgloss.Color("#888888")).
 			Padding(0, 1)
 
 	messageStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#171717")).
-			Padding(0, 1).
-			Width(48)
+			Padding(0, 1)
 
-	// 抖音黑
+	// 抖音
 	douyinStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#000000")).
+			Foreground(lipgloss.Color("#000000")).
 			Padding(0, 1).
 			Bold(true)
 
 	// 哔哩哔哩粉
 	bilibiliStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#FF69B4")).
+			Foreground(lipgloss.Color("#FF69B4")).
 			Padding(0, 1).
 			Bold(true)
 
 	// 快手橙
 	kuaishouStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#FF6600")).
+			Foreground(lipgloss.Color("#FF6600")).
 			Padding(0, 1).
 			Bold(true)
 
 	// 虎牙黄
 	huyaStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#FFD700")).
+			Foreground(lipgloss.Color("#FFD700")).
 			Padding(0, 1).
 			Bold(true)
 
 	// 斗鱼灰
 	douyuStyle = lipgloss.
 			NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#A9A9A9")).
+			Foreground(lipgloss.Color("#A9A9A9")).
 			Padding(0, 1).
 			Bold(true)
 )
@@ -114,6 +100,7 @@ var (
 func printHeader() {
 	header := headerStyle.Render(fmt.Sprintf("🎉 UniBarrage v%s 🎉", "1.0.0"))
 	_, _ = fmt.Fprint(os.Stderr, "\033[H\033[2J") // 清空屏幕
+	_, _ = fmt.Fprint(os.Stderr, "\033[?25l")    // 隐藏光标
 	_, _ = fmt.Fprintln(os.Stderr, "\n"+header)
 }
 
@@ -131,6 +118,8 @@ func refreshLogArea() {
 	for _, log := range logBuffer {
 		_, _ = fmt.Fprintln(os.Stderr, log)
 	}
+	_, _ = fmt.Fprint(os.Stderr, "\033[0m")    // 重置所有样式，避免背景色残留
+	_, _ = fmt.Fprint(os.Stderr, "\033[999;0H") // 将光标移到屏幕外（第 999 行）
 }
 
 // Print 输出函数：根据级别美化日志并输出
@@ -228,7 +217,8 @@ func HandleSignal() {
 	sig := <-sigChan
 	Printf("INFO", "收到信号: %v, 正在终止程序...", sig)
 
-	// 终止整个程序
+	// 显示光标并终止整个程序
+	_, _ = fmt.Fprint(os.Stderr, "\033[?25h") // 显示光标
 	os.Exit(1)
 }
 

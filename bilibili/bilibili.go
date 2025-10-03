@@ -7,17 +7,35 @@ import (
 	uni "UniBarrage/universal"
 	log "UniBarrage/utils/trace"
 	"context"
+	"strconv"
+
 	"github.com/Akegarasu/blivedm-go/client"
 	"github.com/Akegarasu/blivedm-go/message"
 	"github.com/goccy/go-json"
 	"github.com/tidwall/gjson"
-	"strconv"
 )
 
 // StartListen 启动哔哩哔哩直播监听
 func StartListen(room int, cookie string, stopChan chan struct{}) {
 	id := strconv.Itoa(room)
-	c := client.NewClient(room)
+
+	// 先验证房间是否存在和获取房间信息
+	roomInfo, err := FetchRoomInfo(room)
+	if err != nil {
+		log.Printf("ERROR", "获取 B 站房间信息失败: %v", err)
+		close(stopChan)
+		return
+	}
+
+	// 检查房间是否存在
+	if roomInfo.RoomID == 0 {
+		log.Print("ERROR", "B 站房间不存在或已关闭")
+		close(stopChan)
+		return
+	}
+
+	// 使用真实房间ID创建客户端
+	c := client.NewClient(roomInfo.RoomID)
 
 	// 设置 Cookie（如果有）
 	if cookie != "" {
@@ -84,7 +102,10 @@ func StartListen(room int, cookie string, stopChan chan struct{}) {
 	handleGuardBuy := func(event interface{}) {
 		gb := event.(*message.GuardBuy)
 		user, _ := FetchUserData(gb.Uid)
-		avatar, _ := proxy.GenerateImageURL(user.Card.Face)
+		var avatar string
+		if user != nil {
+			avatar, _ = proxy.GenerateImageURL(user.Card.Face)
+		}
 
 		data, _ := uni.CreateUniMessage(
 			id,
@@ -127,7 +148,10 @@ func StartListen(room int, cookie string, stopChan chan struct{}) {
 		var l *message.InteractWord
 		_ = json.Unmarshal([]byte(event.(string)), &l)
 		user, _ := FetchUserData(l.Uid)
-		avatar, _ := proxy.GenerateImageURL(user.Card.Face)
+		var avatar string
+		if user != nil {
+			avatar, _ = proxy.GenerateImageURL(user.Card.Face)
+		}
 
 		data, _ := uni.CreateUniMessage(
 			id,
@@ -148,7 +172,10 @@ func StartListen(room int, cookie string, stopChan chan struct{}) {
 		var e *message.InteractWord
 		_ = json.Unmarshal([]byte(event.(string)), &e)
 		user, _ := FetchUserData(e.Uid)
-		avatar, _ := proxy.GenerateImageURL(user.Card.Face)
+		var avatar string
+		if user != nil {
+			avatar, _ = proxy.GenerateImageURL(user.Card.Face)
+		}
 
 		data, _ := uni.CreateUniMessage(
 			id,
@@ -179,7 +206,7 @@ func StartListen(room int, cookie string, stopChan chan struct{}) {
 		ws.BroadcastToClients(data)
 	}
 
-	err := gifts.InitGiftMap(room)
+	err = gifts.InitGiftMap(room)
 	if err != nil {
 		log.Print("WARN", "哔哩哔哩直播间礼物获取失败")
 	}

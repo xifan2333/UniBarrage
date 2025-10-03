@@ -83,7 +83,7 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 
 #### 欢迎接口 Welcome Endpoint 👋
 
-- **URL**: `/`
+- **URL**: `/api/v1/`
 - **方法 Method**: `GET`
 - **描述 Description**: 返回欢迎信息，验证服务是否启动。
 
@@ -99,7 +99,7 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 
 #### 获取所有服务状态 Get All Services Status 🔄
 
-- **URL**: `/all`
+- **URL**: `/api/v1/all`
 - **方法 Method**: `GET`
 - **描述 Description**: 获取所有正在运行的服务状态。
 
@@ -124,7 +124,7 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 
 #### 获取指定平台的所有服务 Get Services for Specific Platform 🔍
 
-- **URL**: `/{platform}`
+- **URL**: `/api/v1/{platform}`
 - **方法 Method**: `GET`
 - **描述 Description**: 获取指定平台的所有服务。
 
@@ -149,7 +149,7 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 
 #### 获取单个服务状态 Get Single Service Status 🧐
 
-- **URL**: `/{platform}/{roomId}`
+- **URL**: `/api/v1/{platform}/{roomId}`
 - **方法 Method**: `GET`
 - **描述 Description**: 获取指定房间的服务状态。
 
@@ -173,7 +173,7 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 
 #### 启动服务 Start Service 🚀
 
-- **URL**: `/{platform}`
+- **URL**: `/api/v1/{platform}`
 - **方法 Method**: `POST`
 - **描述 Description**: 启动指定平台的直播服务。
 
@@ -207,7 +207,7 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 
 #### 停止服务 Stop Service 🛑
 
-- **URL**: `/{platform}/{roomId}`
+- **URL**: `/api/v1/{platform}/{roomId}`
 - **方法 Method**: `DELETE`
 - **描述 Description**: 停止指定平台房间的服务。
 

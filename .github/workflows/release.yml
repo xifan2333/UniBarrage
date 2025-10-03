@@ -1,0 +1,155 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build Binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            output: UniBarrage-linux-amd64
+          - goos: linux
+            goarch: arm64
+            output: UniBarrage-linux-arm64
+          - goos: darwin
+            goarch: amd64
+            output: UniBarrage-darwin-amd64
+          - goos: darwin
+            goarch: arm64
+            output: UniBarrage-darwin-arm64
+          - goos: windows
+            goarch: amd64
+            output: UniBarrage-windows-amd64.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: 0
+        run: |
+          go build -ldflags="-s -w" -o ${{ matrix.output }} .
+
+      - name: Create archive
+        run: |
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            zip ${{ matrix.output }}.zip ${{ matrix.output }}
+          else
+            tar -czf ${{ matrix.output }}.tar.gz ${{ matrix.output }}
+          fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.output }}
+          path: |
+            ${{ matrix.output }}.tar.gz
+            ${{ matrix.output }}.zip
+          if-no-files-found: ignore
+
+  docker:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract tag name
+        id: tag
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/unibarrage:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/unibarrage:${{ steps.tag.outputs.TAG }}
+
+  release:
+    name: Create Release
+    needs: [build, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Extract tag name
+        id: tag
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Release ${{ steps.tag.outputs.TAG }}
+          body: |
+            ## 🎉 UniBarrage ${{ steps.tag.outputs.TAG }}
+
+            ### 📦 下载方式
+
+            #### 二进制文件
+            根据您的操作系统下载对应的版本：
+            - **Linux amd64**: `UniBarrage-linux-amd64.tar.gz`
+            - **Linux arm64**: `UniBarrage-linux-arm64.tar.gz`
+            - **macOS amd64 (Intel)**: `UniBarrage-darwin-amd64.tar.gz`
+            - **macOS arm64 (Apple Silicon)**: `UniBarrage-darwin-arm64.tar.gz`
+            - **Windows amd64**: `UniBarrage-windows-amd64.exe.zip`
+
+            #### Docker 镜像
+            🐳 Docker Hub: [`${{ secrets.DOCKERHUB_USERNAME }}/unibarrage:${{ steps.tag.outputs.TAG }}`](https://hub.docker.com/r/${{ secrets.DOCKERHUB_USERNAME }}/unibarrage)
+
+            **运行方式：**
+            ```bash
+            # 无认证
+            docker run -d -p 8080:8080 -p 7777:7777 ${{ secrets.DOCKERHUB_USERNAME }}/unibarrage:${{ steps.tag.outputs.TAG }}
+
+            # 带认证
+            docker run -d -p 8080:8080 -p 7777:7777 -e AUTH_TOKEN="your_token" ${{ secrets.DOCKERHUB_USERNAME }}/unibarrage:${{ steps.tag.outputs.TAG }}
+            ```
+
+            ### 📝 更新日志
+            请查看提交历史了解详细更改。
+
+            ---
+            访问 Dashboard: http://localhost:8080
+          files: |
+            artifacts/**/*.tar.gz
+            artifacts/**/*.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
