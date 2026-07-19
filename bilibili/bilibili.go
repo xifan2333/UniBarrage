@@ -9,8 +9,8 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/Akegarasu/blivedm-go/client"
-	"github.com/Akegarasu/blivedm-go/message"
+	"github.com/xifan2333/blivedm-go/client"
+	"github.com/xifan2333/blivedm-go/message"
 	"github.com/goccy/go-json"
 	"github.com/tidwall/gjson"
 )
@@ -143,13 +143,18 @@ func StartListen(room int, cookie string, stopChan chan struct{}) {
 		ws.BroadcastToClients(data)
 	}
 
-	// 处理点赞事件
+	// 处理点赞事件（LIKE_INFO_V3_CLICK data JSON）
 	handleLike := func(event interface{}) {
-		var l *message.InteractWord
-		_ = json.Unmarshal([]byte(event.(string)), &l)
-		user, _ := FetchUserData(l.Uid)
-		var avatar string
-		if user != nil {
+		s, ok := event.(string)
+		if !ok {
+			return
+		}
+		uname := gjson.Get(s, "uname").String()
+		uid := int(gjson.Get(s, "uid").Int())
+		avatar := ""
+		if face := gjson.Get(s, "uinfo.base.face").String(); face != "" {
+			avatar, _ = proxy.GenerateImageURL(face)
+		} else if user, _ := FetchUserData(uid); user != nil {
 			avatar, _ = proxy.GenerateImageURL(user.Card.Face)
 		}
 
@@ -158,22 +163,42 @@ func StartListen(room int, cookie string, stopChan chan struct{}) {
 			uni.BiliBili,
 			uni.LikeMessageType,
 			&uni.LikeMessage{
-				Name:   l.Uname,
+				Name:   uname,
 				Avatar: avatar,
 				Count:  1,
-				Raw:    l,
+				Raw:    json.RawMessage(s),
 			},
 		)
 		ws.BroadcastToClients(data)
 	}
 
-	// 处理进入房间事件
+	// 处理进入房间等互动（库内已解析 INTERACT_WORD_V2）
 	handleInteract := func(event interface{}) {
-		var e *message.InteractWord
-		_ = json.Unmarshal([]byte(event.(string)), &e)
-		user, _ := FetchUserData(e.Uid)
-		var avatar string
-		if user != nil {
+		e, ok := event.(*message.InteractWord)
+		if !ok || e == nil {
+			return
+		}
+		// msg_type: 1进入 2关注 3分享 4特别关注 5互粉 6点赞
+		if e.MsgType != message.InteractMsgTypeEnter {
+			if e.MsgType == message.InteractMsgTypeLike {
+				avatar := ""
+				if e.Face != "" {
+					avatar, _ = proxy.GenerateImageURL(e.Face)
+				} else if user, _ := FetchUserData(e.Uid); user != nil {
+					avatar, _ = proxy.GenerateImageURL(user.Card.Face)
+				}
+				data, _ := uni.CreateUniMessage(
+					id, uni.BiliBili, uni.LikeMessageType,
+					&uni.LikeMessage{Name: e.Uname, Avatar: avatar, Count: 1, Raw: e},
+				)
+				ws.BroadcastToClients(data)
+			}
+			return
+		}
+		avatar := ""
+		if e.Face != "" {
+			avatar, _ = proxy.GenerateImageURL(e.Face)
+		} else if user, _ := FetchUserData(e.Uid); user != nil {
 			avatar, _ = proxy.GenerateImageURL(user.Card.Face)
 		}
 
@@ -243,9 +268,9 @@ func StartListen(room int, cookie string, stopChan chan struct{}) {
 		invokeHandler(eventHandlers["like"], data)
 	})
 
-	c.RegisterCustomEventHandler("INTERACT_WORD", func(s string) {
-		data := gjson.Get(s, "data").String()
-		invokeHandler(eventHandlers["interact"], data)
+	// 进房/关注/点赞等：上游解析 INTERACT_WORD_V2
+	c.OnInteractWord(func(w *message.InteractWord) {
+		invokeHandler(eventHandlers["interact"], w)
 	})
 
 	c.RegisterCustomEventHandler("PREPARING", func(s string) {

@@ -3,7 +3,6 @@ module UniBarrage
 go 1.23.3
 
 require (
-	github.com/Akegarasu/blivedm-go v1.6.0
 	github.com/charmbracelet/lipgloss v1.0.0
 	github.com/dgraph-io/badger/v4 v4.3.1
 	github.com/dop251/goja v0.0.0-20241024094426-79f3a7efcdbd
@@ -21,6 +20,7 @@ require (
 	github.com/tidwall/gjson v1.18.0
 	github.com/urfave/cli/v2 v2.27.5
 	github.com/wasilibs/go-re2 v1.7.0
+	github.com/xifan2333/blivedm-go v1.7.4
 	google.golang.org/protobuf v1.35.1
 )
 
