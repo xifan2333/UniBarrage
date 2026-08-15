@@ -326,11 +326,6 @@ func startXiaoHongShuService(roomID string, cookie string, stopChan chan struct{
 // StartService HTTP 处理函数
 func StartService(w http.ResponseWriter, r *http.Request) {
 	platform := chi.URLParam(r, "platform")
-	// 别名归一
-	switch platform {
-	case "xhs":
-		platform = string(uni.XiaoHongShu)
-	}
 
 	var req struct {
 		RoomID string `json:"rid"`

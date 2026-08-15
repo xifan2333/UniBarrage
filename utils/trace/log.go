@@ -158,7 +158,7 @@ func Print(level, msg string) {
 			levelStyled = huyaStyle.Render(" HUYA ")
 		case "DOUYU":
 			levelStyled = douyuStyle.Render(" DOUV ")
-		case "XIAOHONGSHU", "XHS":
+		case "XIAOHONGSHU":
 			levelStyled = xiaohongshuStyle.Render(" XHS  ")
 		default:
 			levelStyled = level
@@ -202,7 +202,7 @@ func Printf(level, format string, a ...interface{}) {
 			levelStyled = huyaStyle.Render(" HUYA ")
 		case "DOUYU":
 			levelStyled = douyuStyle.Render(" DOUV ")
-		case "XIAOHONGSHU", "XHS":
+		case "XIAOHONGSHU":
 			levelStyled = xiaohongshuStyle.Render(" XHS  ")
 		default:
 			levelStyled = level

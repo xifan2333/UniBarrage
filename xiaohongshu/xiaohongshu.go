@@ -41,22 +41,31 @@ func StartListen(roomID string, cookie string, stopChan chan struct{}) {
 		cancel()
 	}()
 
-	// reconnect loop
+	// reconnect loop — permanent join failures stop; transient reconnect is quiet
 	backoff := time.Second
+	startedOnce := false
 	for {
 		if ctx.Err() != nil {
 			log.Print("INFO", "已停止小红书直播监听")
 			return
 		}
-		err := listenOnce(ctx, roomID)
+		err := listenOnce(ctx, roomID, &startedOnce)
 		if ctx.Err() != nil {
 			log.Print("INFO", "已停止小红书直播监听")
 			return
 		}
 		if err != nil {
-			log.Printf("ERROR", "小红书监听中断: %v；%s 后重连", err, backoff)
-		} else {
-			log.Printf("WARN", "小红书连接结束，%s 后重连", backoff)
+			if pe, ok := err.(*permanentError); ok {
+				// room closed / rejected — one clean line like bilibili, no retry spam
+				log.Print("ERROR", pe.msg)
+				close(stopChan)
+				return
+			}
+			if !startedOnce {
+				// first connect failed for a transient reason — one line, then quiet retry
+				log.Printf("ERROR", "小红书直播监听启动失败: %s", shortErr(err))
+			}
+			// after successful start, drop quiet reconnects (match bilibili)
 		}
 		select {
 		case <-ctx.Done():
@@ -73,12 +82,12 @@ func StartListen(roomID string, cookie string, stopChan chan struct{}) {
 	}
 }
 
-func listenOnce(ctx context.Context, roomID string) error {
+func listenOnce(ctx context.Context, roomID string, startedOnce *bool) error {
 	sess, err := CreateGuestSession()
 	if err != nil {
 		return fmt.Errorf("guest session: %w", err)
 	}
-	log.Printf("XIAOHONGSHU", "游客会话就绪 uid=%s device=%s", sess.UserID, sess.DeviceID)
+	globalUserCache.setSession(sess)
 
 	dialer := websocket.Dialer{
 		HandshakeTimeout: 15 * time.Second,
@@ -109,7 +118,10 @@ func listenOnce(ctx context.Context, roomID string) error {
 	if err := handshake(conn, &writeMu, sess, roomID); err != nil {
 		return err
 	}
-	log.Printf("XIAOHONGSHU", "已启动小红书直播监听 room=%s", roomID)
+	if startedOnce != nil && !*startedOnce {
+		*startedOnce = true
+		log.Print("XIAOHONGSHU", "已启动小红书直播监听")
+	}
 
 	// heartbeat / ping
 	go keepAlive(ctx, conn, &writeMu, sess, roomID)
@@ -197,6 +209,73 @@ func hasAckBody(m map[string]any) bool {
 	return ok
 }
 
+// permanentError means retrying will not help (room closed / rejected).
+type permanentError struct{ msg string }
+
+func (e *permanentError) Error() string { return e.msg }
+
+func ackCodeMsg(m map[string]any) (code int, msg string) {
+	b, _ := m["b"].(map[string]any)
+	if b == nil {
+		return -1, ""
+	}
+	a, _ := b["a"].(map[string]any)
+	if a == nil {
+		return -1, ""
+	}
+	switch c := a["c"].(type) {
+	case float64:
+		code = int(c)
+	case int:
+		code = c
+	case int64:
+		code = int(c)
+	case json.Number:
+		v, _ := c.Int64()
+		code = int(v)
+	default:
+		code = -1
+	}
+	switch v := a["m"].(type) {
+	case string:
+		msg = v
+	}
+	return code, msg
+}
+
+func ackError(phase string, resp map[string]any) error {
+	code, msg := ackCodeMsg(resp)
+	// 9001 = room closed — permanent; user-facing copy matches bilibili
+	if code == 9001 || strings.Contains(msg, "房间已关闭") || strings.Contains(msg, "已关闭") {
+		return &permanentError{msg: "小红书房间不存在或已关闭"}
+	}
+	if msg == "" {
+		msg = "failed"
+	}
+	// internal phase only for non-permanent shortErr path; keep message plain
+	if code > 0 {
+		return fmt.Errorf("%s: %s", phase, msg)
+	}
+	return fmt.Errorf("%s: %s", phase, msg)
+}
+
+func shortErr(err error) string {
+	if err == nil {
+		return ""
+	}
+	s := err.Error()
+	// never dump raw map dumps in logs
+	if strings.Contains(s, "map[") {
+		if i := strings.Index(s, ":"); i > 0 {
+			return strings.TrimSpace(s[:i])
+		}
+	}
+	if len(s) > 160 {
+		return s[:160] + "…"
+	}
+	return s
+}
+
 func ackOK(m map[string]any) bool {
 	// b.a.c == 0
 	b, _ := m["b"].(map[string]any)
@@ -266,7 +345,7 @@ func handshake(conn *websocket.Conn, mu *sync.Mutex, sess *GuestSession, roomID 
 		return fmt.Errorf("auth recv: %w", err)
 	}
 	if !ackOK(resp) {
-		return fmt.Errorf("auth failed: %v", resp)
+		return ackError("auth", resp)
 	}
 
 	// 2 register s=1
@@ -289,7 +368,7 @@ func handshake(conn *websocket.Conn, mu *sync.Mutex, sess *GuestSession, roomID 
 		return fmt.Errorf("register recv: %w", err)
 	}
 	if !ackOK(resp) {
-		return fmt.Errorf("register failed: %v", resp)
+		return ackError("register", resp)
 	}
 
 	// 3 join s=8
@@ -315,7 +394,7 @@ func handshake(conn *websocket.Conn, mu *sync.Mutex, sess *GuestSession, roomID 
 		return fmt.Errorf("join recv: %w", err)
 	}
 	if !ackOK(resp) {
-		return fmt.Errorf("join failed: %v", resp)
+		return ackError("join", resp)
 	}
 
 	// initial heartbeat
@@ -543,8 +622,23 @@ func profileOf(cd map[string]any) (name, avatar, uid string) {
 		return "", "", ""
 	}
 	name = strField(p, "nickname", "nick_name", "name")
-	avatar = strField(p, "avatar")
+	avatar = strField(p, "avatar", "images", "imageb")
 	uid = strField(p, "user_id", "id", "userId")
+	// seed cache from full wire profiles (chat/join/gift)
+	if uid != "" && name != "" {
+		globalUserCache.Remember(uid, name, avatar)
+	}
+	// praise/like often only carries user_id — resolve via cache / otherinfo
+	if (name == "" || avatar == "") && uid != "" {
+		if up, ok := globalUserCache.Get(uid); ok {
+			if name == "" {
+				name = up.Nickname
+			}
+			if avatar == "" {
+				avatar = up.Avatar
+			}
+		}
+	}
 	return
 }
 
@@ -582,7 +676,21 @@ func emitMessage(roomID string, cd map[string]any, raw roomMsg) {
 		ws.BroadcastToClients(data)
 
 	case "praise", "like", "combo_praise", "light", "like_comment", "live_like", "live_common_msg_action":
-		name, avatar, _ := profileOf(cd)
+		// wire profile often has only user_id — resolve nickname/avatar via otherinfo
+		name, avatar, uid := profileOf(cd)
+		if (name == "" || avatar == "") && uid != "" {
+			if up, ok := globalUserCache.Get(uid); ok {
+				if name == "" {
+					name = up.Nickname
+				}
+				if avatar == "" {
+					avatar = up.Avatar
+				}
+			}
+		}
+		if name == "" && uid != "" {
+			name = uid
+		}
 		count := 1
 		if pi := nest(cd, "praise_info"); pi != nil {
 			if c := intField(pi, "count"); c > 0 {
@@ -601,6 +709,10 @@ func emitMessage(roomID string, cd map[string]any, raw roomMsg) {
 		su := nest(cd, "send_user_info")
 		name := strField(su, "nick_name", "nickname", "name")
 		avatar := strField(su, "avatar")
+		uid := strField(su, "user_id", "id", "userId")
+		if uid != "" && name != "" {
+			globalUserCache.Remember(uid, name, avatar)
+		}
 		gi := nest(cd, "base_gift_info")
 		item := strField(gi, "name")
 		icon := strField(gi, "icon")
