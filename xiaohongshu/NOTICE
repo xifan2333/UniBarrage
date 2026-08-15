@@ -1,0 +1,7 @@
+Xiaohongshu edith x-s / x-s-common signing algorithm ported from:
+
+  Cloxl/xhshow  https://github.com/Cloxl/xhshow
+  License: MIT (Copyright (c) 2024 Cloxl)
+
+See that project for the original Python reference implementation.
+RWP danmaku protocol reverse notes live in webcast-mate docs/protocol-xhs-danmaku.md.

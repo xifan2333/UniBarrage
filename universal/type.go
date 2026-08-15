@@ -10,11 +10,12 @@ import (
 type Platform string
 
 const (
-	DouYin   Platform = "douyin"   // 抖音
-	BiliBili Platform = "bilibili" // 哔哩哔哩
-	KuaiShou Platform = "kuaishou" // 快手
-	HuYa     Platform = "huya"     // 虎牙
-	DouYu    Platform = "douyu"    // 斗鱼
+	DouYin      Platform = "douyin"      // 抖音
+	BiliBili    Platform = "bilibili"    // 哔哩哔哩
+	KuaiShou    Platform = "kuaishou"    // 快手
+	HuYa        Platform = "huya"        // 虎牙
+	DouYu       Platform = "douyu"       // 斗鱼
+	XiaoHongShu Platform = "xiaohongshu" // 小红书
 )
 
 // MessageType 定义消息类型
@@ -205,7 +206,7 @@ func handleRawField(raw interface{}) (json.RawMessage, error) {
 // IsValidPlatform 验证 Platform 是否有效
 func IsValidPlatform(platform Platform) bool {
 	switch platform {
-	case DouYin, BiliBili, KuaiShou, HuYa, DouYu:
+	case DouYin, BiliBili, KuaiShou, HuYa, DouYu, XiaoHongShu:
 		return true
 	default:
 		return false
@@ -215,7 +216,7 @@ func IsValidPlatform(platform Platform) bool {
 // CreateUniMessage 创建 UniMessage 的工厂函数
 func CreateUniMessage(rid string, platform Platform, msgType MessageType, data MessageData) (*UniMessage, error) {
 	if !IsValidPlatform(platform) {
-		return nil, errors.New("无效的平台，必须是 'DouYin', 'BiliBili', 'KuaiShou', 'HuYa', 'DouYu' 中之一")
+		return nil, errors.New("无效的平台，必须是 'DouYin', 'BiliBili', 'KuaiShou', 'HuYa', 'DouYu', 'XiaoHongShu' 中之一")
 	}
 
 	switch msgType {

@@ -94,6 +94,13 @@ var (
 			Foreground(lipgloss.Color("#A9A9A9")).
 			Padding(0, 1).
 			Bold(true)
+
+	// 小红书红
+	xiaohongshuStyle = lipgloss.
+				NewStyle().
+				Foreground(lipgloss.Color("#FF2442")).
+				Padding(0, 1).
+				Bold(true)
 )
 
 // printHeader 打印程序启动的欢迎信息
@@ -151,6 +158,8 @@ func Print(level, msg string) {
 			levelStyled = huyaStyle.Render(" HUYA ")
 		case "DOUYU":
 			levelStyled = douyuStyle.Render(" DOUV ")
+		case "XIAOHONGSHU", "XHS":
+			levelStyled = xiaohongshuStyle.Render(" XHS  ")
 		default:
 			levelStyled = level
 		}
@@ -193,6 +202,8 @@ func Printf(level, format string, a ...interface{}) {
 			levelStyled = huyaStyle.Render(" HUYA ")
 		case "DOUYU":
 			levelStyled = douyuStyle.Render(" DOUV ")
+		case "XIAOHONGSHU", "XHS":
+			levelStyled = xiaohongshuStyle.Render(" XHS  ")
 		default:
 			levelStyled = level
 		}

@@ -7,7 +7,7 @@
 
 <br>
 
-**UniBarrage** 是一款开源的高性能实时代理工具，专为开发者设计，旨在统一多平台（如抖音、哔哩哔哩、快手、斗鱼、虎牙）直播弹幕数据的采集、解析和转发。通过标准化的 WebSocket 消息协议和灵活的 API 接口，UniBarrage 将分散的多平台弹幕数据统一为一致的格式，帮助开发者更高效地构建跨平台互动功能。  
+**UniBarrage** 是一款开源的高性能实时代理工具，专为开发者设计，旨在统一多平台（如抖音、哔哩哔哩、快手、斗鱼、虎牙、小红书）直播弹幕数据的采集、解析和转发。通过标准化的 WebSocket 消息协议和灵活的 API 接口，UniBarrage 将分散的多平台弹幕数据统一为一致的格式，帮助开发者更高效地构建跨平台互动功能。  
 
 ---
 
@@ -46,7 +46,7 @@
 
 UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工具，支持高性能实时代理及标准化转发。
 
-- **支持平台**: 抖音、哔哩哔哩、快手、斗鱼、虎牙
+- **支持平台**: 抖音、哔哩哔哩、快手、斗鱼、虎牙、小红书（`xiaohongshu` / 别名 `xhs`，游客可听）
 - **核心功能**: 统一格式的 WebSocket 消息流和灵活的 API 接口
 
 ---
@@ -130,7 +130,7 @@ UniBarrage 是一个帮助开发者统一处理多平台直播弹幕数据的工
 
 **请求参数 Request Parameters:**
 
-- `platform`（路径参数 Path Parameter）：需要查询的直播平台名称，例如 `douyin`, `bilibili`, `kuaishou`, `douyu`, `huya`.
+- `platform`（路径参数 Path Parameter）：需要查询的直播平台名称，例如 `douyin`, `bilibili`, `kuaishou`, `douyu`, `huya`, `xiaohongshu`（别名 `xhs`）。
 
 **响应示例 Response Example:**
 

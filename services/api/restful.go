@@ -6,6 +6,7 @@ import (
 	"UniBarrage/douyu"
 	"UniBarrage/huya"
 	"UniBarrage/kuaishou"
+	"UniBarrage/xiaohongshu"
 	uni "UniBarrage/universal"
 	log "UniBarrage/utils/trace"
 	"UniBarrage/web"
@@ -298,9 +299,38 @@ func startHuYaService(HuYaRoom string, stopChan chan struct{}) error {
 	return nil
 }
 
+// XiaoHongShuRoom string 小红书直播间 ID（/livestream/{id}）, cookie 可选预留
+func startXiaoHongShuService(roomID string, cookie string, stopChan chan struct{}) error {
+	serviceKey := generateServiceKey("xiaohongshu", roomID)
+
+	status := &ServiceStatus{
+		Platform: "xiaohongshu",
+		RoomID:   roomID,
+		StopChan: stopChan,
+	}
+
+	if err := serviceMap.AddService(serviceKey, status); err != nil {
+		return fmt.Errorf("小红书房间 %s 已在监听中", roomID)
+	}
+
+	go func() {
+		go xiaohongshu.StartListen(roomID, cookie, stopChan)
+		<-stopChan
+		serviceMap.RemoveService(serviceKey)
+	}()
+
+	log.Printf("XIAOHONGSHU", "提交 XiaoHongShu 监听服务 (%s)", roomID)
+	return nil
+}
+
 // StartService HTTP 处理函数
 func StartService(w http.ResponseWriter, r *http.Request) {
 	platform := chi.URLParam(r, "platform")
+	// 别名归一
+	switch platform {
+	case "xhs":
+		platform = string(uni.XiaoHongShu)
+	}
 
 	var req struct {
 		RoomID string `json:"rid"`
@@ -368,6 +398,10 @@ func StartService(w http.ResponseWriter, r *http.Request) {
 		case uni.HuYa:
 			// HuYa 使用字符串 RoomID
 			startErr = startHuYaService(req.RoomID, stopChan)
+
+		case uni.XiaoHongShu:
+			// 小红书直播间 ID 为长整型字符串
+			startErr = startXiaoHongShuService(req.RoomID, req.Cookie, stopChan)
 
 		default:
 			// 不支持的平台
