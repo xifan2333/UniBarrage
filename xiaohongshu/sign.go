@@ -11,6 +11,7 @@ import (
 	"hash/crc32"
 	"math/rand"
 	"net/url"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -29,15 +30,15 @@ const (
 )
 
 var (
-	versionBytes  = []byte{121, 104, 96, 41}
-	a3Prefix      = []byte{2, 97, 51, 16}
-	envTable      = []int{115, 248, 83, 102, 103, 201, 181, 131, 99, 94, 4, 68, 250, 132, 21}
-	envChecks     = []int{0, 1, 18, 1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0}
-	hashIV        = [4]uint32{1831565813, 461845907, 2246822507, 3266489909}
-	hexKeyBytes   []byte
-	customEncode  *strings.Replacer
-	x3Encode      *strings.Replacer
-	polyTable     [256]uint32
+	versionBytes = []byte{121, 104, 96, 41}
+	a3Prefix     = []byte{2, 97, 51, 16}
+	envTable     = []int{115, 248, 83, 102, 103, 201, 181, 131, 99, 94, 4, 68, 250, 132, 21}
+	envChecks    = []int{0, 1, 18, 1, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0}
+	hashIV       = [4]uint32{1831565813, 461845907, 2246822507, 3266489909}
+	hexKeyBytes  []byte
+	customEncode *strings.Replacer
+	x3Encode     *strings.Replacer
+	polyTable    [256]uint32
 )
 
 func init() {
@@ -136,8 +137,15 @@ func buildContentString(method, uri string, payload any) (string, error) {
 	if len(m) == 0 {
 		return uri, nil
 	}
+	// Stable alphabetical key order — must match url.Values.Encode() on the wire.
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
 	parts := make([]string, 0, len(m))
-	for k, v := range m {
+	for _, k := range keys {
+		v := m[k]
 		var vs string
 		switch t := v.(type) {
 		case nil:
@@ -154,8 +162,6 @@ func buildContentString(method, uri string, payload any) (string, error) {
 		// xhshow GET: urllib.parse.quote(value, safe=",")
 		parts = append(parts, k+"="+url.QueryEscape(vs))
 	}
-	// Note: map iteration order is random; for GET without params we don't care.
-	// activate/lt don't use GET params in our path.
 	return uri + "?" + strings.Join(parts, "&"), nil
 }
 
